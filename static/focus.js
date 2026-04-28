@@ -33,7 +33,7 @@ async function sendRequest(url) {
         throw error;
     }
 
-    return response.json();
+    return await response.json();
 }
 
 function reqsToMap(requisites) {
