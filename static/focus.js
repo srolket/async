@@ -6,43 +6,23 @@ const API = {
 };
 
 async function run() {
-    try {
-        const orgOgrns = await sendRequest(API.organizationList);
-        const ogrns = orgOgrns.join(",");
-        const requisites = await sendRequest(`${API.orgReqs}?ogrn=${ogrns}`);
-        const orgsMap = reqsToMap(requisites);
-        const analytics = await sendRequest(`${API.analytics}?ogrn=${ogrns}`);
-        addInOrgsMap(orgsMap, analytics, "analytics");
-        const buh = await sendRequest(`${API.buhForms}?ogrn=${ogrns}`);
-        addInOrgsMap(orgsMap, buh, "buhForms");
-        render(orgsMap, orgOgrns);
-    } catch (err) {
-        console.error(err);
-    }
+    const orgOgrns = await sendRequest(API.organizationList);
+    const ogrns = orgOgrns.join(",");
+    const requisites = await sendRequest(`${API.orgReqs}?ogrn=${ogrns}`);
+    const orgsMap = reqsToMap(requisites);
+    const analytics = await sendRequest(`${API.analytics}?ogrn=${ogrns}`);
+    addInOrgsMap(orgsMap, analytics, "analytics");
+    const buh = await sendRequest(`${API.buhForms}?ogrn=${ogrns}`);
+    addInOrgsMap(orgsMap, buh, "buhForms");
+    render(orgsMap, orgOgrns);
 }
 
 run();
 
-function sendRequest(url) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    resolve(JSON.parse(xhr.response));
-                } else {
-                    const error = new Error(xhr.statusText);
-                    error.code = xhr.status;
-                    reject(error);
-                }
-            }
-        };
-        xhr.send();
-    })
+async function sendRequest(url) {
+    const response = await fetch(url);
+    return response.json();
 }
-
 
 function reqsToMap(requisites) {
     return requisites.reduce((acc, item) => {
